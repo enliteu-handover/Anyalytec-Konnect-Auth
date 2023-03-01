@@ -1,0 +1,8 @@
+# Not Required Folders
+.vscode
+build
+node_modules
+
+#Uneccessary files
+.env
+package-lock.json
