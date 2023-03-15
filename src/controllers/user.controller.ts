@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import { hashSync, genSaltSync, compareSync } from "bcrypt";
 import { user, userAttributes } from "../db/models/user";
 import * as UserService from "../services/users.service";
-import { loggedInRecord } from "db/models/logged_in_record";
+import { loggedInRecord } from "./../db/models/init-models";
 
 /**
  * This controller is create a new User and provide access to the same
