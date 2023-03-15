@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import { hashSync, genSaltSync, compareSync } from "bcrypt";
 import { user, userAttributes } from "../db/models/user";
 import * as UserService from "../services/users.service";
-import * as LoggedInRecordService from "../services/logged_in_records.service";
+import { loggedInRecord } from "db/models/logged_in_record";
 
 /**
  * This controller is create a new User and provide access to the same
@@ -56,14 +56,15 @@ export const logIn =
       }
       if (user?.password) {
         if (compareSync(attributes.password!, user.password)) {
-          LoggedInRecordService.create({
-            user_id: user.id,
-            logged_at: new Date(),
-            logger_details: {
-              logged_in: "success",
-              requested_ip_address: req.ip,
-            },
-          });
+          user.addLogged_in_record(
+            new loggedInRecord({
+              logged_at: new Date(),
+              logger_details: {
+                logged_in: "success",
+                requested_ip_address: req.ip,
+              },
+            })
+          );
           delete user.dataValues.password;
           reply.code(200).send({
             success: true,
