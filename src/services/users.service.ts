@@ -1,32 +1,37 @@
-import User, { UserInstance } from "../db/models/user";
-import { UserAttributes, UserCreationAttributes } from "../types";
+import {
+  user,
+  userAttributes,
+  userCreationAttributes,
+} from "../db/models/user";
 
 /**
  * This function creates an UserInstance in DB table users
- * @param {UserCreationAttributes} attributes
- * @returns {Promise<UserInstance>}
+ * @param {userCreationAttributes} attributes
+ * @returns {Promise<user>}
  */
-export const create = (
-  attributes: UserCreationAttributes
-): Promise<UserInstance> => {
-  return User.create(attributes);
+export const create = (attributes: userCreationAttributes): Promise<user> => {
+  return user.create(attributes);
 };
 
 /**
  * This function finds an unique UserInstance in DB table users
- * @param {UserAttributes} attributes
- * @returns {Promise<UserInstance>}
+ * @param {userAttributes} attributes
+ * @returns {Promise<user>}
  */
 export const findUnique = (
-  attributes: UserAttributes
-): Promise<UserInstance> => {
+  attributes: userAttributes
+): Promise<user | null> => {
   let condition: any = {
     is_active: true,
   };
   Object.keys(attributes).forEach((key: string) => {
-    if (attributes[key] !== undefined && key !== "password") {
-      condition[key] = attributes[key];
+    const userAttributeKey = key as keyof userAttributes;
+    if (
+      attributes[userAttributeKey] !== undefined &&
+      userAttributeKey !== "password"
+    ) {
+      condition[userAttributeKey] = attributes[userAttributeKey];
     }
   });
-  return User.findOne({ where: condition });
+  return user.findOne({ where: condition });
 };

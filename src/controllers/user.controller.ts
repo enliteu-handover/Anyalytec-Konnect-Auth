@@ -1,19 +1,16 @@
-import { FastifyRequest, FastifyReply } from "fastify";
+import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import { hashSync, genSaltSync, compareSync } from "bcrypt";
-import { UserInstance } from "../db/models/user";
-import { UserAttributes } from "../types";
+import { user, userAttributes } from "../db/models/user";
 import * as UserService from "../services/users.service";
 import * as LoggedInRecordService from "../services/logged_in_records.service";
-
-type UserCreateBody = { user: UserAttributes };
 
 /**
  * This controller is create a new User and provide access to the same
  */
 export const signIn = async (req: FastifyRequest, reply: FastifyReply) => {
   try {
-    const attributes = (req.body as UserCreateBody).user;
-    const user: UserInstance = await UserService.findUnique(attributes);
+    const attributes = req.body as userAttributes;
+    const user: user | null = await UserService.findUnique(attributes);
     if (user) {
       throw new Error("User already exists!");
     }
@@ -34,7 +31,7 @@ export const signIn = async (req: FastifyRequest, reply: FastifyReply) => {
     });
   } catch (error: any) {
     console.error(error);
-    reply.code(500).send({ error: true, message: error.message });
+    reply.internalServerError(error.message);
   }
 };
 
@@ -42,21 +39,22 @@ export const signIn = async (req: FastifyRequest, reply: FastifyReply) => {
  * This login controller validates user credentials and provides access for the same
  */
 export const logIn =
-  (fastify: any) => async (req: FastifyRequest, reply: FastifyReply) => {
+  (fastify: FastifyInstance) =>
+  async (req: FastifyRequest, reply: FastifyReply) => {
     try {
-      const attributes = (req.body as UserCreateBody).user;
+      const attributes = req.body as userAttributes;
 
       // Default constraints to make sure accessible user logs in
       attributes.is_active = true;
       attributes.is_deleted = false;
 
-      const user: UserInstance = await UserService.findUnique(attributes);
+      const user: user | null = await UserService.findUnique(attributes);
       if (!user) {
         reply
           .code(403)
           .send({ error: true, message: "Please check credentials" });
       }
-      if (user.password) {
+      if (user?.password) {
         if (compareSync(attributes.password!, user.password)) {
           LoggedInRecordService.create({
             user_id: user.id,
@@ -80,13 +78,11 @@ export const logIn =
             },
           });
         } else {
-          reply
-            .code(403)
-            .send({ error: true, message: "Password does not match!" });
+          reply.forbidden("Password does not match!");
         }
       }
     } catch (error: any) {
       console.error(error);
-      reply.code(500).send({ error: true, message: error.message });
+      reply.internalServerError(error.message);
     }
   };

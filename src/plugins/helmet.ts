@@ -1,8 +1,13 @@
 import fp from "fastify-plugin";
-import { FastifyInstance } from "fastify";
+import { FastifyPluginAsync } from "fastify";
+import fastifyHelmet, { FastifyHelmetOptions } from "@fastify/helmet";
 
-export default fp(async (fastify: FastifyInstance, _) => {
-  fastify.register(require("@fastify/helmet"), {
+const helmentPlugin: FastifyPluginAsync<FastifyHelmetOptions> = async (
+  fastify: any
+) => {
+  fastify.register(fastifyHelmet, {
     hidePoweredBy: true,
   });
-});
+};
+
+export default fp(helmentPlugin);

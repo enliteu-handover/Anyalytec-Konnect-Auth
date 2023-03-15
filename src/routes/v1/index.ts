@@ -1,8 +1,9 @@
+import { FastifyInstance } from "fastify";
 import fs from "fs";
 import path from "path";
 import { PRIVATE_FOLDER, PUBLIC_FOLDER } from "../../constants";
 
-const routesLoader = (fastify: any, sourceDir: string) => {
+const routesLoader = (fastify: FastifyInstance, sourceDir: string) => {
   fs.readdirSync(sourceDir, { withFileTypes: true })
     .filter((dirent: any) => dirent.isDirectory())
     .map((item: any) => item.name)
@@ -11,11 +12,10 @@ const routesLoader = (fastify: any, sourceDir: string) => {
 
       //If routes are private they are authenticated with the jwt middleware
       if (sourceDir.includes(PRIVATE_FOLDER)) {
-        fastify.register(
-          route.default,
-          { onRequest: [fastify.authenticate] },
-          { prefix: `/api/v1/${item}` }
-        );
+        fastify.addHook("onRequest", fastify?.authenticate);
+        fastify.register(route.default, {
+          prefix: `/api/v1/${item}`,
+        });
       } else {
         fastify.register(route.default, { prefix: `/api/v1/${item}` });
       }

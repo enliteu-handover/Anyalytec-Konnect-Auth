@@ -1,27 +1,22 @@
 const userBody: object = {
   type: "object",
   properties: {
-    user: {
-      type: "object",
-      properties: {
-        username: {
-          type: "string",
-        },
-        email_id: {
-          type: "string",
-          format: "email",
-        },
-        mobile_no: {
-          type: "string",
-        },
-        password: {
-          type: "string",
-          format: "password",
-        },
-      },
-      required: ["password"],
+    username: {
+      type: "string",
+    },
+    email_id: {
+      type: "string",
+      format: "email",
+    },
+    mobile_no: {
+      type: "string",
+    },
+    password: {
+      type: "string",
+      format: "password",
     },
   },
+  required: ["password"],
 };
 
 export const loginSchema: any = {

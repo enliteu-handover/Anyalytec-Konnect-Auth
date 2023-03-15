@@ -1,5 +1,6 @@
 import fp from "fastify-plugin";
-import { FastifyInstance, FastifyReply } from "fastify";
+import { FastifyPluginAsync, FastifyReply } from "fastify";
+import fastifyJwt, { FastifyJWTOptions } from "@fastify/jwt";
 
 const authorizationMessages: any = {
   badRequestErrorMessage: `Format must be Authorization: Bearer <token>`,
@@ -11,8 +12,17 @@ const authorizationMessages: any = {
   },
 };
 
-export default fp(async (fastify: FastifyInstance, _) => {
-  fastify.register(require("@fastify/jwt"), {
+// Augment the FastifyInstance type
+declare module "fastify" {
+  interface FastifyInstance {
+    authenticate: () => void;
+  }
+}
+
+const jwtPlugin: FastifyPluginAsync<FastifyJWTOptions> = async (
+  fastify: any
+) => {
+  fastify.register(fastifyJwt, {
     secret: process.env.JWT_SECRET,
     messages: authorizationMessages,
     sign: {
@@ -29,4 +39,6 @@ export default fp(async (fastify: FastifyInstance, _) => {
       }
     }
   );
-});
+};
+
+export default fp(jwtPlugin);

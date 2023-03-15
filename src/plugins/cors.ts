@@ -1,11 +1,17 @@
 import fp from "fastify-plugin";
-import { FastifyInstance } from "fastify";
+import { FastifyPluginAsync } from "fastify";
+import fastifyCors, { FastifyCorsOptions } from "@fastify/cors";
 
-export default fp(async (fastify: FastifyInstance, _) => {
-  fastify.register(require("@fastify/cors"), {
+const corsPlugin: FastifyPluginAsync<FastifyCorsOptions> = async (
+  fastify: any,
+  _
+) => {
+  fastify.register(fastifyCors, {
     origin: "*",
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     preflightContinue: false,
     optionsSuccessStatus: 204,
   });
-});
+};
+
+export default fp(corsPlugin);

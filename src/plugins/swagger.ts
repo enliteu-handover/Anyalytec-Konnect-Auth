@@ -1,10 +1,15 @@
 import fp from "fastify-plugin";
-import { FastifyInstance } from "fastify";
+import { FastifyPluginAsync } from "fastify";
+import swagger, { SwaggerOptions } from "@fastify/swagger";
+import fastifySwaggerUi from "@fastify/swagger-ui";
 
 const packageJson = require("../../package.json");
 
-export default fp(async (fastify: FastifyInstance, _) => {
-  fastify.register(require("@fastify/swagger"), {
+const swaggerPlugin: FastifyPluginAsync<SwaggerOptions> = async (
+  fastify: any,
+  _
+) => {
+  fastify.register(swagger, {
     swagger: {
       info: {
         title: "Authorization Framework",
@@ -27,7 +32,7 @@ export default fp(async (fastify: FastifyInstance, _) => {
     },
     exposeRoute: true,
   });
-  fastify.register(require("@fastify/swagger-ui"), {
+  fastify.register(fastifySwaggerUi, {
     routePrefix: "/documentation",
     uiConfig: {
       docExpansion: "full",
@@ -41,4 +46,6 @@ export default fp(async (fastify: FastifyInstance, _) => {
     },
     transformSpecificationClone: true,
   });
-});
+};
+
+export default fp(swaggerPlugin);
