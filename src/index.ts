@@ -51,3 +51,5 @@ if (cluster.isPrimary) {
 } else {
   appStart();
 }
+
+export { server };

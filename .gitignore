@@ -6,3 +6,5 @@ node_modules
 #Uneccessary files
 .env
 package-lock.json
+.scannerwork
+coverage
