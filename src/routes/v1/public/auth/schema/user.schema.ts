@@ -32,3 +32,31 @@ export const signinSchema: any = {
   tags: ["auth"],
   body: userBody,
 };
+
+export const forgotPasswordSchema: any = {
+  description:
+    "A forgot password REST API typically provides user to initiate change password service",
+  tags: ["auth"],
+  body: {
+    type: "object",
+    properties: {
+      email_id: {
+        type: "string",
+        format: "email",
+      },
+    },
+    required: ["email_id"],
+  },
+};
+
+export const verifyTokenSchema: any = {
+  description: "This API validates the token before resetting the password!",
+  tags: ["auth"],
+  headers: {
+    type: "object",
+    properties: {
+      authorization: { type: "string" },
+    },
+    required: ["authorization"],
+  },
+};
