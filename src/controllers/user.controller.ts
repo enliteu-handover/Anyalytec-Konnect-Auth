@@ -12,13 +12,13 @@ import { Op } from "sequelize";
 export const signIn = async (req: FastifyRequest, reply: FastifyReply) => {
   try {
     const attributes = req.body as userAttributes;
-    const user: user | null = await UserService.findUnique(attributes);
-    if (user) {
+    let userInstance: user | null = await UserService.findUnique(attributes);
+    if (userInstance) {
       return reply.unavailableForLegalReasons("User already exists!");
     }
     const salt = genSaltSync(10);
     const hashedPassword = hashSync(attributes.password!, salt);
-    const userInstance = await UserService.create({
+    userInstance = await UserService.create({
       ...attributes,
       password: hashedPassword,
     });

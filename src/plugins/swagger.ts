@@ -40,7 +40,7 @@ const swaggerPlugin: FastifyPluginAsync<SwaggerOptions> = async (
     },
     staticCSP: true,
     transformStaticCSP: (header: any) => header,
-    transformSpecification: (swaggerObject: any, request: any, _: any) => {
+    transformSpecification: (swaggerObject: any, request: any) => {
       swaggerObject.host = request.hostname;
       return swaggerObject;
     },

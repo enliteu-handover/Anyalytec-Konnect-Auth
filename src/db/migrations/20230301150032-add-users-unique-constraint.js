@@ -2,7 +2,7 @@
 
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
-  async up(queryInterface, Sequelize) {
+  async up(queryInterface, _Sequelize) {
     await queryInterface.addConstraint("users", {
       fields: ["username", "email_id", "mobile_no"],
       type: "unique",
@@ -10,7 +10,7 @@ module.exports = {
     });
   },
 
-  async down(queryInterface, Sequelize) {
+  async down(queryInterface, _Sequelize) {
     return Promise.resolve(true);
   },
 };
