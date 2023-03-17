@@ -26,6 +26,8 @@ server.get("/", async (_: any, reply: FastifyReply) => {
 //Configuring Routes
 server.register(routesV1);
 
+export { server };
+
 const numCPUs: number = cpus().length;
 
 const appStart = async () => {
@@ -51,5 +53,3 @@ if (cluster.isPrimary) {
 } else {
   appStart();
 }
-
-export { server };

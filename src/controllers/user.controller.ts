@@ -1,4 +1,4 @@
-import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
+import { FastifyRequest, FastifyReply } from "fastify";
 import { hashSync, genSaltSync, compareSync } from "bcrypt";
 import * as UserService from "../services/users.service";
 import { OtpToken, User, UserAttributes } from "./../db/models/init-models";
@@ -36,53 +36,49 @@ export const signIn = async (req: FastifyRequest, reply: FastifyReply) => {
 /**
  * This login controller validates user credentials and provides access for the same
  */
-export const logIn =
-  (fastify: FastifyInstance) =>
-  async (req: FastifyRequest, reply: FastifyReply) => {
-    try {
-      const attributes = req.body as UserAttributes;
+export const logIn = async (req: FastifyRequest, reply: FastifyReply) => {
+  try {
+    const attributes = req.body as UserAttributes;
 
-      // Default constraints to make sure accessible user logs in
-      attributes.is_active = true;
-      attributes.is_deleted = false;
+    // Default constraints to make sure accessible user logs in
+    attributes.is_active = true;
+    attributes.is_deleted = false;
 
-      const userInstance: User | null = await UserService.findUnique(
-        attributes
-      );
-      if (!userInstance) {
-        return reply.forbidden("Please check credentials");
-      }
-      if (userInstance?.password) {
-        if (compareSync(attributes.password!, userInstance.password)) {
-          await userInstance.createLogged_in_record({
-            logged_at: new Date(),
-            logger_details: {
-              logged_in: "success",
-              requested_ip_address: req.ip,
-            },
-          });
-          delete userInstance.dataValues.password;
-          reply.code(200).send({
-            success: true,
-            message: "Logged in successfully!",
-            data: {
-              user: userInstance,
-              token: fastify.jwt.sign({
-                id: userInstance.id,
-                username: userInstance.username,
-                email_id: userInstance.email_id,
-              }),
-            },
-          });
-        } else {
-          reply.forbidden("Password does not match!");
-        }
-      }
-    } catch (error: any) {
-      console.error(error);
-      reply.internalServerError(error.message);
+    const userInstance: User | null = await UserService.findUnique(attributes);
+    if (!userInstance) {
+      return reply.forbidden("Please check credentials");
     }
-  };
+    if (userInstance?.password) {
+      if (compareSync(attributes.password!, userInstance.password)) {
+        await userInstance.createLogged_in_record({
+          logged_at: new Date(),
+          logger_details: {
+            logged_in: "success",
+            requested_ip_address: req.ip,
+          },
+        });
+        delete userInstance.dataValues.password;
+        reply.code(200).send({
+          success: true,
+          message: "Logged in successfully!",
+          data: {
+            user: userInstance,
+            token: await reply.jwtSign({
+              id: userInstance.id,
+              username: userInstance.username,
+              email_id: userInstance.email_id,
+            }),
+          },
+        });
+      } else {
+        reply.forbidden("Password does not match!");
+      }
+    }
+  } catch (error: any) {
+    console.error(error);
+    reply.internalServerError(error.message);
+  }
+};
 
 export const forgotPassword = async (
   req: FastifyRequest,
@@ -168,7 +164,9 @@ export const resetPassword = async (
       const salt = genSaltSync(10);
       const hashedPassword = hashSync(new_password, salt);
       let userInstance: User | undefined = await otpTokenInstance?.getUser();
-      await userInstance?.update("password", hashedPassword);
+      userInstance?.set("password", hashedPassword);
+      await userInstance?.save();
+      await otpTokenInstance?.destroy();
       reply.code(200).send({
         success: true,
         message: "Password Reset Successfully!",

@@ -11,7 +11,7 @@
     "start:dev": "ts-node -r dotenv/config ./src/index.ts",
     "start": "nodemon -r dotenv/config ./build/index.js",
     "build": "tsc --build --pretty",
-    "test": "jest --coverage",
+    "test": "jest --silent --coverage",
     "prepare": "husky install",
     "code:smell": "node sonarqube-scanner.js"
   },

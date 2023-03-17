@@ -10,7 +10,7 @@ module.exports = {
     });
   },
 
-  async down(queryInterface, _Sequelize) {
+  async down(_queryInterface, _Sequelize) {
     return Promise.resolve(true);
   },
 };

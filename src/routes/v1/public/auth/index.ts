@@ -10,11 +10,7 @@ import {
 
 const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
   fastify.post("/signup", { schema: signinSchema }, UserController.signIn);
-  fastify.post(
-    "/login",
-    { schema: loginSchema },
-    UserController.logIn(fastify)
-  );
+  fastify.post("/login", { schema: loginSchema }, UserController.logIn);
   fastify.post(
     "/forgot_password",
     { schema: forgotPasswordSchema },
