@@ -1,18 +1,17 @@
 import { FastifyRequest, FastifyReply, FastifyInstance } from "fastify";
 import { hashSync, genSaltSync, compareSync } from "bcrypt";
-import { user, userAttributes } from "../db/models/user";
 import * as UserService from "../services/users.service";
-import { otpToken } from "./../db/models/init-models";
+import { OtpToken, User, UserAttributes } from "./../db/models/init-models";
 import { DEFAULT_TOKEN_VALIDITY } from "./../constants";
-import { Op } from "sequelize";
+import { TOKEN_CONTANTS, validateToken } from "./../services/otptoken.service";
 
 /**
  * This controller is create a new User and provide access to the same
  */
 export const signIn = async (req: FastifyRequest, reply: FastifyReply) => {
   try {
-    const attributes = req.body as userAttributes;
-    let userInstance: user | null = await UserService.findUnique(attributes);
+    const attributes = req.body as UserAttributes;
+    let userInstance: User | null = await UserService.findUnique(attributes);
     if (userInstance) {
       return reply.unavailableForLegalReasons("User already exists!");
     }
@@ -22,7 +21,7 @@ export const signIn = async (req: FastifyRequest, reply: FastifyReply) => {
       ...attributes,
       password: hashedPassword,
     });
-    delete userInstance.dataValues.password;
+    delete userInstance?.dataValues.password;
     reply.code(200).send({
       success: true,
       message: "Successfully created User!",
@@ -41,13 +40,13 @@ export const logIn =
   (fastify: FastifyInstance) =>
   async (req: FastifyRequest, reply: FastifyReply) => {
     try {
-      const attributes = req.body as userAttributes;
+      const attributes = req.body as UserAttributes;
 
       // Default constraints to make sure accessible user logs in
       attributes.is_active = true;
       attributes.is_deleted = false;
 
-      const userInstance: user | null = await UserService.findUnique(
+      const userInstance: User | null = await UserService.findUnique(
         attributes
       );
       if (!userInstance) {
@@ -90,8 +89,8 @@ export const forgotPassword = async (
   reply: FastifyReply
 ) => {
   try {
-    const attributes = req.body as userAttributes;
-    const userInstance: user | null = await UserService.findUnique(attributes);
+    const attributes = req.body as UserAttributes;
+    const userInstance: User | null = await UserService.findUnique(attributes);
     if (!userInstance) {
       reply.code(403).send({ error: true, message: "No Such User Exists!" });
     } else {
@@ -134,19 +133,55 @@ export const verifyToken = async (req: FastifyRequest, reply: FastifyReply) => {
     if (!token) {
       reply.forbidden("Missing Authorisation Token!");
     }
-    let otpTokenIntance = await otpToken.findOne({
-      where: { token, valid_till: { [Op.gte]: new Date() } },
-    });
-    if (otpTokenIntance) {
+    reply.code(200).send(await validateToken({ token: token }));
+  } catch (error: any) {
+    console.error(error);
+    if (error.message == TOKEN_CONTANTS.INVALID) {
+      reply.forbidden(TOKEN_CONTANTS.INVALID);
+    } else {
+      reply.internalServerError(error.message);
+    }
+  }
+};
+
+interface ResetPasswordBody {
+  new_password: string;
+}
+
+export const resetPassword = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    let token: string | undefined = req.headers.authorization?.split(" ")[1];
+    if (!token) {
+      reply.forbidden("Missing Authorisation Token!");
+    }
+
+    let { new_password } = req.body as ResetPasswordBody;
+
+    let status: any = await validateToken({ token });
+    if (status.success) {
+      let otpTokenInstance: OtpToken | null = await OtpToken.findOne({
+        where: { token },
+      });
+      const salt = genSaltSync(10);
+      const hashedPassword = hashSync(new_password, salt);
+      let userInstance: User | undefined = await otpTokenInstance?.getUser();
+      await userInstance?.update("password", hashedPassword);
       reply.code(200).send({
         success: true,
-        message: "Token is Valid!",
+        message: "Password Reset Successfully!",
       });
     } else {
-      reply.forbidden("Token is in Valid!");
+      reply.forbidden(TOKEN_CONTANTS.INVALID);
     }
   } catch (error: any) {
     console.error(error);
-    reply.internalServerError(error.message);
+    if (error.message == TOKEN_CONTANTS.INVALID) {
+      reply.forbidden(TOKEN_CONTANTS.INVALID);
+    } else {
+      reply.internalServerError(error.message);
+    }
   }
 };

@@ -1,48 +1,39 @@
 import type { Sequelize } from "sequelize";
-import { loggedInRecord as _loggedInRecord } from "./logged_in_record";
-import type {
-  loggedInRecordAttributes,
-  loggedInRecordCreationAttributes,
-} from "./logged_in_record";
-import { otpToken as _otpToken } from "./otp_token";
-import type {
-  otpTokenAttributes,
-  otpTokenCreationAttributes,
-} from "./otp_token";
-import { user as _user } from "./user";
-import type { userAttributes, userCreationAttributes } from "./user";
+import { LoggedInRecord as _LoggedInRecord } from "./logged_in_record";
+import type { LoggedInRecordAttributes, LoggedInRecordCreationAttributes } from "./logged_in_record";
+import { OtpToken as _OtpToken } from "./otp_token";
+import type { OtpTokenAttributes, OtpTokenCreationAttributes } from "./otp_token";
+import { User as _User } from "./user";
+import type { UserAttributes, UserCreationAttributes } from "./user";
 
 export {
-  _loggedInRecord as loggedInRecord,
-  _otpToken as otpToken,
-  _user as user,
+  _LoggedInRecord as LoggedInRecord,
+  _OtpToken as OtpToken,
+  _User as User,
 };
 
 export type {
-  loggedInRecordAttributes,
-  loggedInRecordCreationAttributes,
-  otpTokenAttributes,
-  otpTokenCreationAttributes,
-  userAttributes,
-  userCreationAttributes,
+  LoggedInRecordAttributes,
+  LoggedInRecordCreationAttributes,
+  OtpTokenAttributes,
+  OtpTokenCreationAttributes,
+  UserAttributes,
+  UserCreationAttributes,
 };
 
 export function initModels(sequelize: Sequelize) {
-  const loggedInRecord = _loggedInRecord.initModel(sequelize);
-  const otpToken = _otpToken.initModel(sequelize);
-  const user = _user.initModel(sequelize);
+  const LoggedInRecord = _LoggedInRecord.initModel(sequelize);
+  const OtpToken = _OtpToken.initModel(sequelize);
+  const User = _User.initModel(sequelize);
 
-  loggedInRecord.belongsTo(user, { as: "user", foreignKey: "user_id" });
-  user.hasMany(loggedInRecord, {
-    as: "logged_in_records",
-    foreignKey: "user_id",
-  });
-  otpToken.belongsTo(user, { as: "user", foreignKey: "user_id" });
-  user.hasMany(otpToken, { as: "otp_tokens", foreignKey: "user_id" });
+  LoggedInRecord.belongsTo(User, { as: "user", foreignKey: "user_id"});
+  User.hasMany(LoggedInRecord, { as: "logged_in_records", foreignKey: "user_id"});
+  OtpToken.belongsTo(User, { as: "user", foreignKey: "user_id"});
+  User.hasMany(OtpToken, { as: "otp_tokens", foreignKey: "user_id"});
 
   return {
-    loggedInRecord: loggedInRecord,
-    otpToken: otpToken,
-    user: user,
+    LoggedInRecord: LoggedInRecord,
+    OtpToken: OtpToken,
+    User: User,
   };
 }

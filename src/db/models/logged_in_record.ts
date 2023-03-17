@@ -1,8 +1,8 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
-import type { user, userId } from './user';
+import type { User, UserId } from './user';
 
-export interface loggedInRecordAttributes {
+export interface LoggedInRecordAttributes {
   id: number;
   user_id?: number;
   logger_details?: object;
@@ -11,12 +11,12 @@ export interface loggedInRecordAttributes {
   updated_at: Date;
 }
 
-export type loggedInRecordPk = "id";
-export type loggedInRecordId = loggedInRecord[loggedInRecordPk];
-export type loggedInRecordOptionalAttributes = "id" | "user_id" | "logger_details" | "logged_at" | "created_at" | "updated_at";
-export type loggedInRecordCreationAttributes = Optional<loggedInRecordAttributes, loggedInRecordOptionalAttributes>;
+export type LoggedInRecordPk = "id";
+export type LoggedInRecordId = LoggedInRecord[LoggedInRecordPk];
+export type LoggedInRecordOptionalAttributes = "id" | "user_id" | "logger_details" | "logged_at" | "created_at" | "updated_at";
+export type LoggedInRecordCreationAttributes = Optional<LoggedInRecordAttributes, LoggedInRecordOptionalAttributes>;
 
-export class loggedInRecord extends Model<loggedInRecordAttributes, loggedInRecordCreationAttributes> implements loggedInRecordAttributes {
+export class LoggedInRecord extends Model<LoggedInRecordAttributes, LoggedInRecordCreationAttributes> implements LoggedInRecordAttributes {
   id!: number;
   user_id?: number;
   logger_details?: object;
@@ -24,14 +24,14 @@ export class loggedInRecord extends Model<loggedInRecordAttributes, loggedInReco
   created_at!: Date;
   updated_at!: Date;
 
-  // loggedInRecord belongsTo user via user_id
-  user!: user;
-  getUser!: Sequelize.BelongsToGetAssociationMixin<user>;
-  setUser!: Sequelize.BelongsToSetAssociationMixin<user, userId>;
-  createUser!: Sequelize.BelongsToCreateAssociationMixin<user>;
+  // LoggedInRecord belongsTo User via user_id
+  user!: User;
+  getUser!: Sequelize.BelongsToGetAssociationMixin<User>;
+  setUser!: Sequelize.BelongsToSetAssociationMixin<User, UserId>;
+  createUser!: Sequelize.BelongsToCreateAssociationMixin<User>;
 
-  static initModel(sequelize: Sequelize.Sequelize): typeof loggedInRecord {
-    return loggedInRecord.init({
+  static initModel(sequelize: Sequelize.Sequelize): typeof LoggedInRecord {
+    return LoggedInRecord.init({
     id: {
       autoIncrement: true,
       type: DataTypes.INTEGER,

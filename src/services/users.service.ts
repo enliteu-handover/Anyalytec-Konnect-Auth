@@ -1,31 +1,31 @@
 import {
-  user,
-  userAttributes,
-  userCreationAttributes,
+  User,
+  UserAttributes,
+  UserCreationAttributes,
 } from "../db/models/user";
 
 /**
  * This function creates an UserInstance in DB table users
- * @param {userCreationAttributes} attributes
- * @returns {Promise<user>}
+ * @param {UserCreationAttributes} attributes
+ * @returns {Promise<User>}
  */
-export const create = (attributes: userCreationAttributes): Promise<user> => {
-  return user.create(attributes);
+export const create = (attributes: UserCreationAttributes): Promise<User> => {
+  return User.create(attributes);
 };
 
 /**
  * This function finds an unique UserInstance in DB table users
- * @param {userAttributes} attributes
+ * @param {UserAttributes} attributes
  * @returns {Promise<user>}
  */
 export const findUnique = (
-  attributes: userAttributes
-): Promise<user | null> => {
+  attributes: UserAttributes
+): Promise<User | null> => {
   let condition: any = {
     is_active: true,
   };
   Object.keys(attributes).forEach((key: string) => {
-    const userAttributeKey = key as keyof userAttributes;
+    const userAttributeKey = key as keyof UserAttributes;
     if (
       attributes[userAttributeKey] !== undefined &&
       userAttributeKey !== "password"
@@ -33,5 +33,5 @@ export const findUnique = (
       condition[userAttributeKey] = attributes[userAttributeKey];
     }
   });
-  return user.findOne({ where: condition });
+  return User.findOne({ where: condition });
 };

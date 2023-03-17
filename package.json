@@ -7,6 +7,7 @@
     "test": "test"
   },
   "scripts": {
+    "model-auto-generator": "ts-node -r dotenv/config ./src/utils/model-generator.ts",
     "start:dev": "ts-node -r dotenv/config ./src/index.ts",
     "start": "nodemon -r dotenv/config ./build/index.js",
     "build": "tsc --build --pretty",

@@ -3,6 +3,7 @@ import * as UserController from "../../../../controllers/user.controller";
 import {
   forgotPasswordSchema,
   loginSchema,
+  resetPasswordSchema,
   signinSchema,
   verifyTokenSchema,
 } from "./schema/user.schema";
@@ -23,6 +24,11 @@ const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
     "/verify_token",
     { schema: verifyTokenSchema },
     UserController.verifyToken
+  );
+  fastify.post(
+    "/reset_password",
+    { schema: resetPasswordSchema },
+    UserController.resetPassword
   );
   done();
 };

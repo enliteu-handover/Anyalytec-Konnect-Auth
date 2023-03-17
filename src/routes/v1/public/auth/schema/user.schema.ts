@@ -60,3 +60,24 @@ export const verifyTokenSchema: any = {
     required: ["authorization"],
   },
 };
+
+export const resetPasswordSchema: any = {
+  description: "This API validates the resets the user password!",
+  tags: ["auth"],
+  body: {
+    type: "object",
+    properties: {
+      new_password: {
+        type: "string",
+      },
+    },
+    required: ["new_password"],
+  },
+  headers: {
+    type: "object",
+    properties: {
+      authorization: { type: "string" },
+    },
+    required: ["authorization"],
+  },
+};
