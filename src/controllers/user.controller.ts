@@ -88,34 +88,27 @@ export const forgotPassword = async (
     const attributes = req.body as UserAttributes;
     const userInstance: User | null = await UserService.findUnique(attributes);
     if (!userInstance) {
-      reply.code(403).send({ error: true, message: "No Such User Exists!" });
+      reply.forbidden("No Such User Exists!");
     } else {
-      if (!userInstance?.is_active) {
-        reply.code(403).send({
-          error: true,
-          message: "User is in-active, Please contact admin!",
-        });
-      } else {
-        let tempDate: Date = new Date();
-        tempDate = new Date(
-          tempDate.setMinutes(tempDate.getMinutes() + DEFAULT_TOKEN_VALIDITY)
-        );
-        let token: string = await reply.jwtSign(
-          { email_id: userInstance.email_id },
-          { expiresIn: DEFAULT_TOKEN_VALIDITY }
-        );
-        await userInstance.createOtp_token({
+      let tempDate: Date = new Date();
+      tempDate = new Date(
+        tempDate.setMinutes(tempDate.getMinutes() + DEFAULT_TOKEN_VALIDITY)
+      );
+      let token: string = await reply.jwtSign(
+        { email_id: userInstance.email_id },
+        { expiresIn: DEFAULT_TOKEN_VALIDITY }
+      );
+      await userInstance.createOtp_token({
+        token: token,
+        valid_till: tempDate,
+      });
+      reply.code(200).send({
+        success: true,
+        data: {
           token: token,
           valid_till: tempDate,
-        });
-        reply.code(200).send({
-          success: true,
-          data: {
-            token: token,
-            valid_till: tempDate,
-          },
-        });
-      }
+        },
+      });
     }
   } catch (error: any) {
     console.error(error);

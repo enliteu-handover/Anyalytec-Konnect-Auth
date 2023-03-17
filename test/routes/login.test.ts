@@ -31,4 +31,18 @@ describe("login tests", () => {
     let {  message } = JSON.parse(res.payload);
     expect(message).toEqual("Please check credentials");
   });
+
+  test("failed login", async () => {
+    const res = await app.inject({
+      method: "post",
+      url: "/api/v1/auth/login",
+      payload: {
+        username: "modiji",
+        password: "modiji12",
+      },
+    });
+    expect(res.statusCode).toBe(403);
+    let {  message } = JSON.parse(res.payload);
+    expect(message).toEqual("Password does not match!");
+  });
 });
