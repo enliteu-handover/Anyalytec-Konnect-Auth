@@ -12,10 +12,24 @@ const authorizationMessages: any = {
   },
 };
 
+interface UserData {
+  id: string;
+  username: string;
+  email_id: string;
+  iat?: number;
+  exp?: number;
+}
+
 // Augment the FastifyInstance type
 declare module "fastify" {
   interface FastifyInstance {
     authenticate: () => void;
+  }
+}
+
+declare module "@fastify/jwt" {
+  interface FastifyJWT {
+    user: UserData;
   }
 }
 

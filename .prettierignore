@@ -1,6 +1,5 @@
 # Ignore artifacts:
 build
-test
 package.json
 package-lock.json
 src/db/models

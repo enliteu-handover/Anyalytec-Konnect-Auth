@@ -79,7 +79,7 @@ export const logIn = async (req: FastifyRequest, reply: FastifyReply) => {
     reply.internalServerError(error.message);
   }
 };
-
+/** This controller checks and initiates forget password  */
 export const forgotPassword = async (
   req: FastifyRequest,
   reply: FastifyReply
@@ -116,6 +116,7 @@ export const forgotPassword = async (
   }
 };
 
+/** This controller validates token to reset password  */
 export const verifyToken = async (req: FastifyRequest, reply: FastifyReply) => {
   try {
     let token: string | undefined = req.headers.authorization?.split(" ")[1];
@@ -174,5 +175,25 @@ export const resetPassword = async (
     } else {
       reply.internalServerError(error.message);
     }
+  }
+};
+
+export const preValidateSignUp = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    const attributes = req.body as UserAttributes;
+    const userInstance: User | null = await UserService.findUnique(attributes);
+    if (userInstance) {
+      reply.conflict("User already exists!");
+    } else {
+      reply.code(200).send({
+        success: true,
+        message: "User available to create!",
+      });
+    }
+  } catch (error: any) {
+    reply.internalServerError(error.message);
   }
 };

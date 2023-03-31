@@ -1,3 +1,5 @@
+import { defaultTokenisedHeader } from "./../../../schema/default.schema";
+
 const userBody: object = {
   type: "object",
   properties: {
@@ -53,11 +55,7 @@ export const verifyTokenSchema: any = {
   description: "This API validates the token before resetting the password!",
   tags: ["auth"],
   headers: {
-    type: "object",
-    properties: {
-      authorization: { type: "string" },
-    },
-    required: ["authorization"],
+    ...defaultTokenisedHeader,
   },
 };
 
@@ -74,10 +72,26 @@ export const resetPasswordSchema: any = {
     required: ["new_password"],
   },
   headers: {
+    ...defaultTokenisedHeader,
+  },
+};
+
+export const preValidateUserSchema: any = {
+  description: "This API validates the user avilability before sign up",
+  tags: ["auth"],
+  body: {
     type: "object",
     properties: {
-      authorization: { type: "string" },
+      username: {
+        type: "string",
+      },
+      email_id: {
+        type: "string",
+        format: "email",
+      },
+      mobile_no: {
+        type: "string",
+      },
     },
-    required: ["authorization"],
   },
 };
