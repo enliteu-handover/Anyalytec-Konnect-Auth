@@ -20,6 +20,20 @@ describe("Complete Reset Password Test", () => {
     expect(success).toEqual(true);
   });
 
+  test("Successfull Refresh Token", async () => {
+    const res = await app.inject({
+      method: "get",
+      url: "/api/v1/auth/refresh",
+      headers: {
+        authorization: `Bearer ${generatedUserToken}`,
+      },
+    });
+    expect(res.statusCode).toBe(200);
+    let { success, message } = JSON.parse(res.payload);
+    expect(success).toEqual(true);
+    expect(message).toEqual("Refreshed successfully!");
+  });
+
   test("successfull verify token", async () => {
     const res = await app.inject({
       method: "get",

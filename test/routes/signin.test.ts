@@ -27,9 +27,9 @@ describe("signup tests", () => {
         password: "12345678",
       },
     });
-    expect(res.statusCode).toBe(451);
+    expect(res.statusCode).toBe(409);
     let { error, message } = JSON.parse(res.payload);
-    expect(error).toEqual("Unavailable For Legal Reasons");
+    expect(error).toEqual("Conflict");
     expect(message).toEqual("User already exists!");
   });
 });

@@ -13,7 +13,7 @@ export const signIn = async (req: FastifyRequest, reply: FastifyReply) => {
     const attributes = req.body as UserAttributes;
     let userInstance: User | null = await UserService.findUnique(attributes);
     if (userInstance) {
-      return reply.unavailableForLegalReasons("User already exists!");
+      return reply.conflict("User already exists!");
     }
     const salt = genSaltSync(10);
     const hashedPassword = hashSync(attributes.password!, salt);
