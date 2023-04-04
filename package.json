@@ -7,11 +7,12 @@
     "test": "test"
   },
   "scripts": {
-    "model-auto-generator": "ts-node -r dotenv/config ./src/utils/model-generator.ts",
-    "start:dev": "ts-node -r dotenv/config ./src/index.ts",
-    "start": "npm run build && nodemon -r dotenv/config ./build/index.js",
+    "set-env":"npx secretstash -e DEV -s 2638DD94523CFCD0",
+    "model-auto-generator": "npm run set-env ts-node ./src/utils/model-generator.ts",
+    "start:dev": "npm run set-env ts-node ./src/index.ts",
+    "start": "npm run set-env node ./build/index.js",
     "build": "tsc --build --pretty",
-    "test": "jest --silent --coverage",
+    "test": "npm run set-env jest --silent --coverage",
     "prepare": "husky install",
     "code:smell": "node sonarqube-scanner.js"
   },
@@ -35,6 +36,7 @@
     "fastify-plugin": "^4.5.0",
     "pg": "^8.9.0",
     "pg-hstore": "^2.3.4",
+    "secretstash": "^1.0.5",
     "sequelize": "^6.29.0",
     "sequelize-auto": "^0.8.8"
   },
