@@ -17,9 +17,9 @@ COPY . .
 RUN npm run build
 
 # Expose the port that the application listens on
-EXPOSE $PORT
+EXPOSE 8080
 
-HEALTHCHECK --interval=5m --timeout=3s CMD curl -f http://localhost/$PORT || exit 1
+HEALTHCHECK CMD curl -f http://localhost:8080 || exit 1
 
 # Start the application
 CMD ["npm", "start"]

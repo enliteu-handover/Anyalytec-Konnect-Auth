@@ -1,5 +1,5 @@
 import cluster from "cluster";
-import { fastify, FastifyReply } from "fastify";
+import { fastify, FastifyInstance, FastifyReply } from "fastify";
 import { cpus } from "os";
 import fastifyAutoload from "@fastify/autoload";
 import path from "path";
@@ -8,7 +8,7 @@ import routesV1 from "./routes/v1";
 
 let PORT: number = Number(process.env.PORT) || 8080;
 
-const server: any = fastify({
+const server: FastifyInstance = fastify({
   logger: pinoLogger,
 });
 
@@ -32,7 +32,7 @@ const numCPUs: number = cpus().length;
 
 const appStart = async () => {
   try {
-    await server.listen({ port: PORT });
+    await server.listen({ port: PORT, host: "0.0.0.0" });
   } catch (error) {
     server.log.error(error);
     process.exit(1);
