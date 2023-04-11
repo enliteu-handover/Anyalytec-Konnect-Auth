@@ -6,3 +6,6 @@ export const DEFAULT_TOKEN_VALIDITY = Boolean(
 )
   ? Number(process.env.DEFAULT_TOKEN_VALIDITY)
   : 30;
+
+export const OTP_LENGTH = 6;
+export const ALERTSHUB_SEND_OTP_REFERENCE_ID: string = "signUpOtp";

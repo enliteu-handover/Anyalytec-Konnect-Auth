@@ -1,5 +1,6 @@
 import { FastifyInstance } from "fastify";
 import * as UserController from "../../../../controllers/user.controller";
+import * as OTPController from "../../../../controllers/otp.controller";
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -32,6 +33,9 @@ const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
     { schema: resetPasswordSchema },
     UserController.resetPassword
   );
+  fastify.post("/send_otp", OTPController.sendOtp);
+  fastify.post("/verify_otp", OTPController.verifyOtp);
+  fastify.post("/resend_otp", OTPController.resendOtp);
   done();
 };
 

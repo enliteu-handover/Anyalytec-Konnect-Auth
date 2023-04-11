@@ -3,7 +3,7 @@ import { hashSync, genSaltSync, compareSync } from "bcrypt";
 import * as UserService from "../services/users.service";
 import { OtpToken, User, UserAttributes } from "./../db/models/init-models";
 import { DEFAULT_TOKEN_VALIDITY } from "./../constants";
-import { TOKEN_CONTANTS, validateToken } from "./../services/otptoken.service";
+import { TOKEN_CONSTANTS, validateToken } from "./../services/otptoken.service";
 
 /**
  * This controller is create a new User and provide access to the same
@@ -79,6 +79,7 @@ export const logIn = async (req: FastifyRequest, reply: FastifyReply) => {
     reply.internalServerError(error.message);
   }
 };
+
 /** This controller checks and initiates forget password  */
 export const forgotPassword = async (
   req: FastifyRequest,
@@ -126,8 +127,8 @@ export const verifyToken = async (req: FastifyRequest, reply: FastifyReply) => {
     reply.code(200).send(await validateToken({ token: token }));
   } catch (error: any) {
     console.error(error);
-    if (error.message == TOKEN_CONTANTS.INVALID) {
-      reply.forbidden(TOKEN_CONTANTS.INVALID);
+    if (error.message == TOKEN_CONSTANTS.INVALID) {
+      reply.forbidden(TOKEN_CONSTANTS.INVALID);
     } else {
       reply.internalServerError(error.message);
     }
@@ -138,6 +139,7 @@ interface ResetPasswordBody {
   new_password: string;
 }
 
+/** This Controller Resets passowrd for the requested user */
 export const resetPassword = async (
   req: FastifyRequest,
   reply: FastifyReply
@@ -166,18 +168,19 @@ export const resetPassword = async (
         message: "Password Reset Successfully!",
       });
     } else {
-      reply.forbidden(TOKEN_CONTANTS.INVALID);
+      reply.forbidden(TOKEN_CONSTANTS.INVALID);
     }
   } catch (error: any) {
     console.error(error);
-    if (error.message == TOKEN_CONTANTS.INVALID) {
-      reply.forbidden(TOKEN_CONTANTS.INVALID);
+    if (error.message == TOKEN_CONSTANTS.INVALID) {
+      reply.forbidden(TOKEN_CONSTANTS.INVALID);
     } else {
       reply.internalServerError(error.message);
     }
   }
 };
 
+/** This Controller checks whether user exists or not*/
 export const preValidateSignUp = async (
   req: FastifyRequest,
   reply: FastifyReply
