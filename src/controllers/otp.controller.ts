@@ -28,6 +28,11 @@ export const sendOtp = async (req: FastifyRequest, reply: FastifyReply) => {
       userInstance = await UserService.create(attributes);
     }
     let otp: number = generateRandomNumber(OTP_LENGTH);
+    if (process.env.NODE_ENV == "development") {
+      otp = Number(
+        Array.from({ length: OTP_LENGTH }, (_, i) => i + 1).join("")
+      );
+    }
     let tempDate: Date = new Date();
     tempDate = new Date(
       tempDate.setMinutes(tempDate.getMinutes() + DEFAULT_TOKEN_VALIDITY)

@@ -21,6 +21,12 @@ const defaultAlertsHubRequest: AlertsHubRequest = {
 
 export const alertHub = (payload: AlertsHubRequest) => {
   return new Promise((resolve, reject) => {
+    if (process.env.NODE_ENV) {
+      return resolve({
+        status: "Success",
+        message: "Message sent as dev!",
+      });
+    }
     let URL = process.env.ALERTS_HUB_URL;
     if (!URL) {
       return reject(new Error("ALERTS_HUB_URL is not available!"));

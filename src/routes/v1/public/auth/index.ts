@@ -8,6 +8,8 @@ import {
   resetPasswordSchema,
   signinSchema,
   verifyTokenSchema,
+  sendOTPSchema,
+  verifyOTPSchema,
 } from "./schema/user.schema";
 
 const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
@@ -33,9 +35,17 @@ const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
     { schema: resetPasswordSchema },
     UserController.resetPassword
   );
-  fastify.post("/send_otp", OTPController.sendOtp);
-  fastify.post("/verify_otp", OTPController.verifyOtp);
-  fastify.post("/resend_otp", OTPController.resendOtp);
+  fastify.post("/send_otp", { schema: sendOTPSchema }, OTPController.sendOtp);
+  fastify.post(
+    "/verify_otp",
+    { schema: verifyOTPSchema },
+    OTPController.verifyOtp
+  );
+  fastify.post(
+    "/resend_otp",
+    { schema: sendOTPSchema },
+    OTPController.resendOtp
+  );
   done();
 };
 

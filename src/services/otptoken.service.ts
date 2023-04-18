@@ -15,7 +15,6 @@ export const validateToken = (params: OtpTokenCreationAttributes) => {
           [Op.gte]: new Date(),
         },
       },
-      logging: console.log,
     })
       .then((result: OtpToken | null) => {
         if (result) resolve({ success: true, message: TOKEN_CONSTANTS.VALID });

@@ -95,3 +95,35 @@ export const preValidateUserSchema: any = {
     },
   },
 };
+
+export const sendOTPSchema: any = {
+  description: "This API triggers an OTP to User Mobile No.",
+  tags: ["auth"],
+  body: {
+    type: "object",
+    properties: {
+      mobile_no_std_code: {
+        type: "string",
+      },
+      mobile_no: {
+        type: "string",
+      },
+    },
+    required: ["mobile_no"],
+  },
+};
+
+export const verifyOTPSchema: any = {
+  ...sendOTPSchema,
+  description: "This API validates the OTP and authorises the user",
+  body: {
+    ...sendOTPSchema.body,
+    properties: {
+      ...sendOTPSchema.body.properties,
+      otp: {
+        type: "number",
+      },
+    },
+    required: ["mobile_no", "otp"],
+  },
+};
