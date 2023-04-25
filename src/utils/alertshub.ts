@@ -21,7 +21,7 @@ const defaultAlertsHubRequest: AlertsHubRequest = {
 
 export const alertHub = (payload: AlertsHubRequest) => {
   return new Promise((resolve, reject) => {
-    if (process.env.NODE_ENV) {
+    if (process.env.NODE_ENV == "development") {
       return resolve({
         status: "Success",
         message: "Message sent as dev!",
