@@ -1,7 +1,5 @@
 import { FastifyReply, FastifyRequest } from "fastify";
 
-const token = process.env.TOKEN;
-
 interface metaWebhookAuthenticatePayload {
   "hub.mode": string;
   "hub.verify_token": string;
@@ -23,7 +21,7 @@ export const metaAuthenticateWebhook = (
   let webhookPayload = req.query as metaWebhookAuthenticatePayload;
   if (
     webhookPayload["hub.mode"] == "subscribe" &&
-    webhookPayload["hub.verify_token"] == token
+    webhookPayload["hub.verify_token"] == process.env.META_WEBHOOK_TOKEN
   ) {
     reply.code(200).send(webhookPayload["hub.challenge"]);
   } else {
