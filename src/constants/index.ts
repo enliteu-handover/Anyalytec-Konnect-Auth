@@ -9,3 +9,6 @@ export const DEFAULT_TOKEN_VALIDITY = Boolean(
 
 export const OTP_LENGTH = 6;
 export const ALERTSHUB_SEND_OTP_REFERENCE_ID: string = "signUpOtp";
+
+export const WHATSAPP_MESSAGE_ENDPOINT: string = "/messages";
+export const WHATSAPP_MESSAGE_FOR_AUTH: string = "Send message to initiate!";
