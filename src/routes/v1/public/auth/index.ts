@@ -1,6 +1,7 @@
 import { FastifyInstance } from "fastify";
 import * as UserController from "../../../../controllers/user.controller";
 import * as OTPController from "../../../../controllers/otp.controller";
+import * as WhastAppController from "../../../../controllers/whatsapp.controller";
 import {
   forgotPasswordSchema,
   loginSchema,
@@ -10,6 +11,7 @@ import {
   verifyTokenSchema,
   sendOTPSchema,
   verifyOTPSchema,
+  verifyWhatsappTokenSchema,
 } from "./schema/user.schema";
 
 const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
@@ -45,6 +47,11 @@ const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
     "/resend_otp",
     { schema: sendOTPSchema },
     OTPController.resendOtp
+  );
+  fastify.post(
+    "/verify_whatsapp_token",
+    { schema: verifyWhatsappTokenSchema },
+    WhastAppController.authoriseWhatsappToken
   );
   done();
 };

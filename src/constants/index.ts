@@ -12,3 +12,9 @@ export const ALERTSHUB_SEND_OTP_REFERENCE_ID: string = "signUpOtp";
 
 export const WHATSAPP_MESSAGE_ENDPOINT: string = "/messages";
 export const WHATSAPP_MESSAGE_FOR_AUTH: string = "Send message to initiate!";
+
+export const LOG_STATUS = {
+  SUCCESS: "success",
+  WHATSAPP_REQUESTED: "Whatsapp requested",
+  WHATSAPP_SUCCESSFULL: "Whatsapp Login Successfull",
+};

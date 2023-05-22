@@ -127,3 +127,17 @@ export const verifyOTPSchema: any = {
     required: ["mobile_no", "otp"],
   },
 };
+
+export const verifyWhatsappTokenSchema: any = {
+  description: "This API validates a Token from Whatsapp Based Login",
+  tags: ["auth"],
+  body: {
+    type: "object",
+    properties: {
+      token: {
+        type: "string",
+      },
+    },
+    required: ["token"],
+  },
+};

@@ -34,6 +34,7 @@
     "bcrypt": "^5.1.0",
     "fastify": "^4.15.0",
     "fastify-plugin": "^4.5.0",
+    "nanoid": "^3.3.6",
     "pg": "^8.10.0",
     "pg-hstore": "^2.3.4",
     "secretstash": "^1.0.5",

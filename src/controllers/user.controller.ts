@@ -2,7 +2,7 @@ import { FastifyRequest, FastifyReply } from "fastify";
 import { hashSync, genSaltSync, compareSync } from "bcrypt";
 import * as UserService from "../services/users.service";
 import { OtpToken, User, UserAttributes } from "./../db/models/init-models";
-import { DEFAULT_TOKEN_VALIDITY } from "./../constants";
+import { DEFAULT_TOKEN_VALIDITY, LOG_STATUS } from "./../constants";
 import { TOKEN_CONSTANTS, validateToken } from "./../services/otptoken.service";
 
 /**
@@ -53,7 +53,7 @@ export const logIn = async (req: FastifyRequest, reply: FastifyReply) => {
         await userInstance.createLogged_in_record({
           logged_at: new Date(),
           logger_details: {
-            logged_in: "success",
+            logged_in: LOG_STATUS.SUCCESS,
             requested_ip_address: req.ip,
           },
         });

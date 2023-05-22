@@ -1,9 +1,15 @@
-import { WHATSAPP_MESSAGE_FOR_AUTH } from "./../constants";
+import { LOG_STATUS, WHATSAPP_MESSAGE_FOR_AUTH } from "./../constants";
 import { FastifyReply, FastifyRequest } from "fastify";
 import * as UserService from "../services/users.service";
 import { splitMobileNoandSTDCode } from "../utils/common";
-import { UserAttributes } from "../db/models/user";
+import {
+  User,
+  UserAttributes,
+  OtpToken,
+  OtpTokenAttributes,
+} from "../db/models/init-models";
 import { sendWhatsappMessage } from "../services/whatsapp.service";
+import { nanoid } from "nanoid";
 
 interface metaWebhookAuthenticatePayload {
   "hub.mode": string;
@@ -87,21 +93,19 @@ export const metaWebhookMessage = async (
             mobile_no,
           });
         }
-        let messageBody: string = `Click to continue ${
-          process.env.WEBAPP_BASE_URL
-        }?auth_token=${await reply.jwtSign({
-          id: userInstance.id,
-          username: userInstance.username,
-          email_id: userInstance.email_id,
-        })}`;
+        const token: string = nanoid();
+        await userInstance.createOtp_token({
+          token,
+        });
+        let messageBody: string = `Click to continue ${process.env.WEBAPP_BASE_URL}?auth_token=${token}`;
         let whatsappResponse: any = await sendWhatsappMessage({
           userPhoneNumber,
           messageBody,
-        });        
+        });
         await userInstance.createLogged_in_record({
           logged_at: new Date(),
           logger_details: {
-            logged_in: "success",
+            staus: LOG_STATUS.WHATSAPP_REQUESTED,
             requested_ip_address: req.ip,
             wamid: whatsappResponse?.messages?.[0]?.id,
           },
@@ -109,6 +113,49 @@ export const metaWebhookMessage = async (
       }
     }
     reply.code(200).send();
+  } catch (error) {
+    console.error(error);
+    reply.code(404).send();
+  }
+};
+
+export const authoriseWhatsappToken = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    let OtpTokenAttributes = req.body as OtpTokenAttributes;
+    let otpTokenInstance: OtpToken | null = await OtpToken.findOne({
+      where: { token: OtpTokenAttributes.token },
+    });
+    if (!otpTokenInstance) {
+      return reply.forbidden("Wrong or InValid Token!");
+    }
+    let userInstance: User = await otpTokenInstance.getUser();
+    if (!userInstance || !userInstance.is_active) {
+      return reply.forbidden("User is not available or No access granted!");
+    }
+    await otpTokenInstance?.destroy();
+    await userInstance.createLogged_in_record({
+      logged_at: new Date(),
+      logger_details: {
+        logged_in: LOG_STATUS.SUCCESS,
+        requested_ip_address: req.ip,
+      },
+    });
+    delete userInstance.password;
+    reply.code(200).send({
+      success: true,
+      message: "Logged in successfully!",
+      data: {
+        user: userInstance,
+        token: await reply.jwtSign({
+          id: userInstance.id,
+          username: userInstance.username,
+          email_id: userInstance.email_id,
+        }),
+      },
+    });
   } catch (error) {
     console.error(error);
     reply.code(404).send();
