@@ -4,6 +4,12 @@ import * as UserService from "../services/users.service";
 import { OtpToken, User, UserAttributes } from "./../db/models/init-models";
 import { DEFAULT_TOKEN_VALIDITY, LOG_STATUS } from "./../constants";
 import { TOKEN_CONSTANTS, validateToken } from "./../services/otptoken.service";
+import { ResetPasswordBody } from "./../types/request_body";
+
+const generateHashedPassword = (password: string): string => {
+  const salt = genSaltSync(10);
+  return hashSync(password, salt);
+};
 
 /**
  * This controller is create a new User and provide access to the same
@@ -15,8 +21,7 @@ export const signIn = async (req: FastifyRequest, reply: FastifyReply) => {
     if (userInstance) {
       return reply.conflict("User already exists!");
     }
-    const salt = genSaltSync(10);
-    const hashedPassword = hashSync(attributes.password!, salt);
+    const hashedPassword = generateHashedPassword(attributes.password!);
     userInstance = await UserService.create({
       ...attributes,
       password: hashedPassword,
@@ -135,10 +140,6 @@ export const verifyToken = async (req: FastifyRequest, reply: FastifyReply) => {
   }
 };
 
-interface ResetPasswordBody {
-  new_password: string;
-}
-
 /** This Controller Resets passowrd for the requested user */
 export const resetPassword = async (
   req: FastifyRequest,
@@ -157,8 +158,7 @@ export const resetPassword = async (
       let otpTokenInstance: OtpToken | null = await OtpToken.findOne({
         where: { token },
       });
-      const salt = genSaltSync(10);
-      const hashedPassword = hashSync(new_password, salt);
+      const hashedPassword = generateHashedPassword(new_password);
       let userInstance: User | undefined = await otpTokenInstance?.getUser();
       userInstance?.set("password", hashedPassword);
       await userInstance?.save();
@@ -197,6 +197,42 @@ export const preValidateSignUp = async (
       });
     }
   } catch (error: any) {
+    reply.internalServerError(error.message);
+  }
+};
+
+/** This Controller checks existing password and updates the same  */
+export const loggedInResetPassword = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    let { old_password, new_password } = req.body as ResetPasswordBody;
+    let userId = req.user.id;
+    let userInstance = await User.findByPk(userId);
+    if (!userInstance) {
+      reply.code(403).send({
+        error: true,
+        message: "No such user found!",
+      });
+    } else {
+      if (compareSync(old_password, userInstance.password!)) {
+        const hashedPassword: string = generateHashedPassword(new_password);
+        userInstance.password = hashedPassword;
+        await userInstance.save();
+        reply.code(200).send({
+          success: true,
+          message: "Password Changed Successfully!",
+        });
+      } else {
+        reply.code(403).send({
+          error: true,
+          message: "Please check your old password!",
+        });
+      }
+    }
+  } catch (error: any) {
+    console.error(error);
     reply.internalServerError(error.message);
   }
 };

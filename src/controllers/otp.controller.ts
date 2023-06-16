@@ -40,7 +40,10 @@ export const sendOtp = async (req: FastifyRequest, reply: FastifyReply) => {
     if (isExistingUser)
       await OtpToken.destroy({ where: { user_id: userInstance.id } }); //Removing Existing OTP tokens!
     await userInstance.createOtp_token({ otp, valid_till: tempDate });
-    let alertHubResponse: any = await triggerOTP({ ...userInstance, otp });
+    let alertHubResponse: any = await triggerOTP({
+      ...userInstance.dataValues,
+      otp,
+    });
     reply.code(200).send({ isExistingUser, ...alertHubResponse });
   } catch (error: any) {
     console.error(error);

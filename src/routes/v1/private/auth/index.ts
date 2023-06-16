@@ -1,5 +1,6 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
-import { refreshUserSchema } from "./schema/user.schema";
+import { refreshUserSchema, resetPasswordSchema } from "./schema/user.schema";
+import { loggedInResetPassword } from "./../../../../controllers/user.controller";
 
 const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
   //If routes are private they are authenticated with the jwt middleware
@@ -21,6 +22,11 @@ const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
         },
       });
     }
+  );
+  fastify.patch(
+    "/reset_password",
+    { schema: resetPasswordSchema },
+    loggedInResetPassword
   );
   done();
 };
