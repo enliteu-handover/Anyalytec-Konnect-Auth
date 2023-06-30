@@ -54,9 +54,7 @@ export const forgotPasswordSchema: any = {
 export const verifyTokenSchema: any = {
   description: "This API validates the token before resetting the password!",
   tags: ["auth"],
-  headers: {
-    ...defaultTokenisedHeader,
-  },
+  ...defaultTokenisedHeader,
 };
 
 export const resetPasswordSchema: any = {
@@ -71,9 +69,7 @@ export const resetPasswordSchema: any = {
     },
     required: ["new_password"],
   },
-  headers: {
-    ...defaultTokenisedHeader,
-  },
+  ...defaultTokenisedHeader,
 };
 
 export const preValidateUserSchema: any = {

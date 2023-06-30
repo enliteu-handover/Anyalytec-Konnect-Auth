@@ -3,17 +3,13 @@ import { defaultTokenisedHeader } from "./../../../schema/default.schema";
 export const refreshUserSchema: any = {
   description: "This API refreshes user token",
   tags: ["auth"],
-  headers: {
-    ...defaultTokenisedHeader,
-  },
+  ...defaultTokenisedHeader,
 };
 
 export const resetPasswordSchema: any = {
   description: "This API resets user password",
   tags: ["auth"],
-  headers: {
-    ...defaultTokenisedHeader,
-  },
+  ...defaultTokenisedHeader,
   body: {
     type: "object",
     properties: {

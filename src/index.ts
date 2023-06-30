@@ -5,11 +5,16 @@ import fastifyAutoload from "@fastify/autoload";
 import path from "path";
 import { pinoLogger } from "./utils/logger";
 import routesV1 from "./routes/v1";
+import { ajvFilePlugin } from "@fastify/multipart";
 
 let PORT: number = Number(process.env.PORT) || 8080;
 
 const server: FastifyInstance = fastify({
   logger: pinoLogger,
+  ajv: {
+    // Adds the file plugin to help @fastify/swagger schema generation
+    plugins: [ajvFilePlugin]
+  }
 });
 
 //Auto Loading Plugins in Fastify

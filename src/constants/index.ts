@@ -18,3 +18,7 @@ export const LOG_STATUS = {
   WHATSAPP_REQUESTED: "Whatsapp requested",
   WHATSAPP_SUCCESSFULL: "Whatsapp Login Successfull",
 };
+
+export const FILE_UPLOAD_FOLDER = "./src/uploads";
+
+export const DEFAULT_PASSWORD = process.env.DEFAULT_PASSWORD || "PASS@123";

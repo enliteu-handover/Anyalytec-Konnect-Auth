@@ -1,10 +1,24 @@
-import { FastifyRequest, FastifyReply } from "fastify";
+import { FastifyRequest, FastifyReply, RouteHandlerMethod } from "fastify";
 import { hashSync, genSaltSync, compareSync } from "bcrypt";
+import csvParser from "csv-parser";
+import XLSX from "xlsx";
 import * as UserService from "../services/users.service";
-import { OtpToken, User, UserAttributes } from "./../db/models/init-models";
-import { DEFAULT_TOKEN_VALIDITY, LOG_STATUS } from "./../constants";
+import {
+  OtpToken,
+  User,
+  UserAttributes,
+  UserCreationAttributes,
+} from "./../db/models/init-models";
+import {
+  DEFAULT_PASSWORD,
+  DEFAULT_TOKEN_VALIDITY,
+  FILE_UPLOAD_FOLDER,
+  LOG_STATUS,
+} from "./../constants";
 import { TOKEN_CONSTANTS, validateToken } from "./../services/otptoken.service";
 import { ResetPasswordBody } from "./../types/request_body";
+import { createReadStream, promises } from "fs";
+import { resolve as pathResolve } from "path";
 
 const generateHashedPassword = (password: string): string => {
   const salt = genSaltSync(10);
@@ -233,6 +247,119 @@ export const loggedInResetPassword = async (
     }
   } catch (error: any) {
     console.error(error);
+    reply.internalServerError(error.message);
+  }
+};
+
+const ALLOWED_UPLOAD_FORMATS: Array<string> = ["csv", "xls", "xlsx"];
+
+const preProcessFile = (filePath: string): Promise<Array<any>> => {
+  return new Promise((resolve, reject) => {
+    try {
+      let users: Array<any> = [];
+      if (filePath.toLowerCase().includes("csv")) {
+        createReadStream(filePath)
+          .pipe(csvParser())
+          .on("data", (chunk: Array<any>) => users.push(chunk))
+          .on("close", () => {
+            resolve(users);
+          })
+          .on("error", reject);
+      } else {
+        const workBook = XLSX.readFile(filePath);
+        users = XLSX.utils.sheet_to_json(
+          workBook.Sheets[workBook.SheetNames[0]]
+        );
+        resolve(users);
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+};
+
+const extractData = (data: Array<any>): Array<UserCreationAttributes> => {
+  return data.map((i) => {
+    return {
+      username: i?.username,
+      email_id: i?.email_id,
+      mobile_no: i?.mobile_no.toString(),
+      mobile_no_std_code: i?.mobile_no_std_code.toString(),
+      password: generateHashedPassword(i?.password ?? DEFAULT_PASSWORD),
+    };
+  });
+};
+
+export const bulkUserRegistration: RouteHandlerMethod = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  try {
+    const { upload_file } = req.body as any;
+    if (upload_file) {
+      let { filename } = upload_file;
+      if (
+        !ALLOWED_UPLOAD_FORMATS.includes(filename.split(".")[1].toLowerCase())
+      ) {
+        return reply.badRequest("Please upload CSV or Excel file!");
+      }
+      let filePath = pathResolve(FILE_UPLOAD_FOLDER, filename);
+      await promises.writeFile(filePath, upload_file.file);
+      let users: Array<any> = await preProcessFile(filePath);
+      users = await extractData(users);
+      await Promise.all(
+        users.map(async (ele: UserCreationAttributes) => {
+          let { username, email_id, mobile_no, password } = ele;
+          let userInstance: User | null = await UserService.findUnique({
+            username,
+            email_id,
+            mobile_no,
+          } as UserAttributes);
+          if (userInstance) {
+            userInstance.password = password;
+            await userInstance.save();
+          } else {
+            await UserService.create({
+              ...ele,
+            });
+          }
+        })
+      );
+      reply.code(200).send({
+        message: "Successfully uploaded and user registered!",
+      });
+    } else {
+      reply.badRequest(`Please upload a file!`);
+    }
+  } catch (error: any) {
+    console.error(error);
+    reply.internalServerError(error.message);
+  }
+};
+
+interface Params {
+  user_id: number;
+}
+
+export const resetUserPassword: RouteHandlerMethod = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  let { user_id } = req.params as Params;
+  let { new_password } = req.body as ResetPasswordBody;
+  try {
+    let userInstance: User | null = await User.findByPk(user_id);
+    if (!userInstance) {
+      reply.forbidden("User doesn't exists!");
+    } else {
+      userInstance.password = generateHashedPassword(new_password);
+      await userInstance.save();
+      reply
+        .code(200)
+        .send({ success: true, message: "Successfully updated password!" });
+    }
+  } catch (error: any) {
+    console.log(error);
     reply.internalServerError(error.message);
   }
 };

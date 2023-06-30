@@ -1,7 +1,7 @@
 import fp from "fastify-plugin";
 import { FastifyPluginAsync } from "fastify";
 import swagger, { SwaggerOptions } from "@fastify/swagger";
-import fastifySwaggerUi from "@fastify/swagger-ui";
+import fastifySwaggerUi, { FastifySwaggerUiOptions } from "@fastify/swagger-ui";
 
 const packageJson = require("../../package.json");
 
@@ -18,20 +18,19 @@ const swaggerPlugin: FastifyPluginAsync<SwaggerOptions> = async (
         version: packageJson.version,
       },
       schemes: ["http", "https"],
-      consumes: ["application/json"],
+      consumes: ["multipart/form-data", "application/json"],
       produces: ["application/json"],
-      components: {
-        securitySchemes: {
-          bearerAuth: {
-            type: "http",
-            scheme: "bearer",
-            bearerFormat: "JWT",
-          },
+      securityDefinitions: {
+        bearerAuth: {
+          type: "apiKey",
+          name: "Authorization",
+          in: "header",
         },
       },
     },
+    hideUntagged: true,
     exposeRoute: true,
-  });
+  } as SwaggerOptions);
   fastify.register(fastifySwaggerUi, {
     routePrefix: "/documentation",
     uiConfig: {
@@ -45,7 +44,7 @@ const swaggerPlugin: FastifyPluginAsync<SwaggerOptions> = async (
       return swaggerObject;
     },
     transformSpecificationClone: true,
-  });
+  } as FastifySwaggerUiOptions);
 };
 
 export default fp(swaggerPlugin);
