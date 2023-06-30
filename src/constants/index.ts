@@ -22,3 +22,12 @@ export const LOG_STATUS = {
 export const FILE_UPLOAD_FOLDER = "./src/uploads";
 
 export const DEFAULT_PASSWORD = process.env.DEFAULT_PASSWORD || "PASS@123";
+
+export const APP_URL = process.env.WEBAPP_BASE_URL || "http://localhost:8080";
+
+export const AUTH_REDIRECT = "redirect";
+
+export const GOOGLE_AUTH = {
+  CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
+  SECRET: process.env.GOOGLE_SECRET || "",
+};

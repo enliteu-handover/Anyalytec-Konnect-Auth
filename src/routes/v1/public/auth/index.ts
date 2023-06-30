@@ -13,6 +13,7 @@ import {
   verifyOTPSchema,
   verifyWhatsappTokenSchema,
 } from "./schema/user.schema";
+import { googleAuthRoutes } from "./google";
 
 const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
   fastify.post(
@@ -53,6 +54,7 @@ const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
     { schema: verifyWhatsappTokenSchema },
     WhastAppController.authoriseWhatsappToken
   );
+  fastify.register(googleAuthRoutes, { prefix: "/google" });
   done();
 };
 
