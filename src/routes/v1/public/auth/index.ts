@@ -14,6 +14,7 @@ import {
   verifyWhatsappTokenSchema,
 } from "./schema/user.schema";
 import { googleAuthRoutes } from "./google";
+import { slackAuthRoutes } from "./slack";
 
 const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
   fastify.post(
@@ -55,6 +56,7 @@ const authRoutes = (fastify: FastifyInstance, _: any, done: any) => {
     WhastAppController.authoriseWhatsappToken
   );
   fastify.register(googleAuthRoutes, { prefix: "/google" });
+  fastify.register(slackAuthRoutes, { prefix: "/slack" });
   done();
 };
 

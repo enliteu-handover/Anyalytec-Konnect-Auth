@@ -9,7 +9,7 @@ const autoOptions: AutoOptions = {
   additional: {
     timestamps: false,
   },
-  schema: "public",
+  schema: config.schema,
   caseModel: "p",
   skipTables: ["SequelizeMeta"],
   singularize: true,

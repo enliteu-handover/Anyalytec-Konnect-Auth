@@ -31,3 +31,8 @@ export const GOOGLE_AUTH = {
   CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "",
   SECRET: process.env.GOOGLE_SECRET || "",
 };
+
+export const SLACK_AUTH = {
+  CLIENT_ID: process.env.SLACK_BOT_ID || "",
+  SECRET: process.env.SLACK_SECRET || "",
+};

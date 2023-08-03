@@ -12,6 +12,7 @@ export interface SequelizeOptions {
   host: string;
   dialect: Dialect;
   port: number;
+  schema: string | "public";
 }
 
 declare module "fastify" {
