@@ -363,3 +363,30 @@ export const resetUserPassword: RouteHandlerMethod = async (
     reply.internalServerError(error.message);
   }
 };
+
+export const updateUserDetails: RouteHandlerMethod = async (
+  req: FastifyRequest,
+  reply: FastifyReply
+) => {
+  let { user_id } = req.params as Params;
+  let { email_id, mobile_no, mobile_no_std_code } =
+    req.body as Partial<UserAttributes>;
+  try {
+    let userInstance: User | null = await User.findByPk(user_id);
+    if (!userInstance) {
+      reply.forbidden("User doesn't exists!");
+    } else {
+      if (email_id) userInstance.email_id = email_id;
+      if (mobile_no_std_code)
+        userInstance.mobile_no_std_code = mobile_no_std_code;
+      if (mobile_no) userInstance.mobile_no = mobile_no;
+      await userInstance.save();
+      reply
+        .code(200)
+        .send({ success: true, message: "Successfully updated user!" });
+    }
+  } catch (error: any) {
+    console.log(error);
+    reply.internalServerError(error.message);
+  }
+};

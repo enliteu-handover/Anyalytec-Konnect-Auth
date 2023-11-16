@@ -1,9 +1,14 @@
 import {
   bulkUserRegistration,
   resetUserPassword,
+  updateUserDetails,
 } from "./../../../../controllers/user.controller";
 import { FastifyInstance } from "fastify";
-import { bulkUserRegistrationSchema, resetPassword } from "./schema";
+import {
+  bulkUserRegistrationSchema,
+  resetPassword,
+  updateUserSchema,
+} from "./schema";
 
 const userRoutes = (fastify: FastifyInstance, _options: any, done: any) => {
   //If routes are private they are authenticated with the jwt middleware
@@ -17,6 +22,11 @@ const userRoutes = (fastify: FastifyInstance, _options: any, done: any) => {
     "/reset_password/:user_id",
     { schema: resetPassword },
     resetUserPassword
+  );
+  fastify.patch(
+    "/:user_id",
+    { schema: updateUserSchema },
+    updateUserDetails
   );
   done();
 };

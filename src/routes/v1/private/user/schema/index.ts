@@ -34,3 +34,26 @@ export const resetPassword: any = {
     required: ["new_password"],
   },
 };
+
+export const updateUserSchema: any = {
+  description: "This API is to reset existing password!",
+  tags: ["user"],
+  ...defaultTokenisedHeader,
+  params: {
+    type: "object",
+    properties: {
+      user_id: {
+        type: "string",
+        description: "user id",
+      },
+    },
+  },
+  body: {
+    type: "object",
+    properties: {
+      email_id: { type: "string" },
+      mobile_no_std_code: { type: "string" },
+      mobile_no: { type: "string" },
+    },
+  },
+};
