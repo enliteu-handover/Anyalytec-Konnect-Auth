@@ -295,7 +295,11 @@ export const bulkUserRegistration: RouteHandlerMethod = async (
   reply: FastifyReply
 ) => {
   try {
-    const { upload_file } = req.body as any;
+    const { upload_file, bulk_users } = req.body as any;
+    if (!upload_file && !bulk_users) {
+      reply.badRequest(`Please upload a file or provide bulk_users!`);
+    }
+    let users: Array<any> = [];
     if (upload_file) {
       let { filename } = upload_file;
       if (
@@ -305,8 +309,14 @@ export const bulkUserRegistration: RouteHandlerMethod = async (
       }
       let filePath = pathResolve(FILE_UPLOAD_FOLDER, filename);
       await promises.writeFile(filePath, upload_file.file);
-      let users: Array<any> = await preProcessFile(filePath);
+      users = await preProcessFile(filePath);
       users = await extractData(users);
+    }
+    if (bulk_users && bulk_users.length) {
+      users = bulk_users;
+    }
+    let responseUserData: Array<Partial<UserAttributes>> = [];
+    if (users.length) {
       await Promise.all(
         users.map(async (ele: UserCreationAttributes) => {
           let { username, email_id, mobile_no, password } = ele;
@@ -316,20 +326,29 @@ export const bulkUserRegistration: RouteHandlerMethod = async (
             mobile_no,
           } as UserAttributes);
           if (userInstance) {
-            userInstance.password = password;
+            userInstance.password = generateHashedPassword(
+              password ?? "Enlite@1234"
+            );
             await userInstance.save();
           } else {
-            await UserService.create({
+            userInstance = await UserService.create({
               ...ele,
             });
           }
+          responseUserData.push({
+            id: userInstance.getDataValue("id"),
+            username,
+            email_id,
+            mobile_no,
+          });
         })
       );
       reply.code(200).send({
-        message: "Successfully uploaded and user registered!",
+        status: "success",
+        userData: responseUserData,
       });
     } else {
-      reply.badRequest(`Please upload a file!`);
+      reply.badRequest("No users provided for bulk upload!");
     }
   } catch (error: any) {
     console.error(error);

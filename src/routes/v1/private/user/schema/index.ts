@@ -1,15 +1,35 @@
+import { FastifySchema } from "fastify";
 import { defaultTokenisedHeader } from "./../../../schema/default.schema";
 
-export const bulkUserRegistrationSchema: any = {
+export const bulkUserRegistrationSchema: FastifySchema = {
   description: "This API is to register multiple users!",
   tags: ["user"],
-  consumes: ["multipart/form-data"],
+  consumes: ["multipart/form-data", "application/json"],
   ...defaultTokenisedHeader,
   body: {
     type: "object",
     properties: {
       upload_file: { isFile: true },
+      bulk_users: {
+        type: "array",
+        items: {
+          properties: {
+            username: { type: "string" },
+            email_id: { type: "string" },
+            mobile_no: { type: "string" },
+            password: { type: "string" },
+          },
+        },
+      },
     },
+    oneOf: [
+      {
+        required: ["upload_file"],
+      },
+      {
+        required: ["bulk_users"],
+      },
+    ],
   },
 };
 
