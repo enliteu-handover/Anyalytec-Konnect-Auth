@@ -13,6 +13,7 @@ export const bulkUserRegistrationSchema: FastifySchema = {
       bulk_users: {
         type: "array",
         items: {
+          type:"object",
           properties: {
             username: { type: "string" },
             email_id: { type: "string" },

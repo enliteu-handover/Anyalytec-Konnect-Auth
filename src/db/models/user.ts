@@ -2,6 +2,7 @@ import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { LoggedInRecord, LoggedInRecordId } from './logged_in_record';
 import type { OtpToken, OtpTokenId } from './otp_token';
+import config from './../config/config';
 
 export interface UserAttributes {
   id: number;
@@ -112,7 +113,7 @@ export class User extends Model<UserAttributes, UserCreationAttributes> implemen
   }, {
     sequelize,
     tableName: 'users',
-    schema: 'public',
+    schema: config.schema,
     timestamps: false,
     indexes: [
       {

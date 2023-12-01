@@ -1,6 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { User, UserId } from './user';
+import config from './../config/config';
 
 export interface LoggedInRecordAttributes {
   id: number;
@@ -67,7 +68,7 @@ export class LoggedInRecord extends Model<LoggedInRecordAttributes, LoggedInReco
   }, {
     sequelize,
     tableName: 'logged_in_records',
-    schema: 'public',
+    schema: config.schema,
     timestamps: false,
     indexes: [
       {

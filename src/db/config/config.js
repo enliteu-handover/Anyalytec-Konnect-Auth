@@ -9,5 +9,5 @@ module.exports = {
   host: DB_HOST,
   port: DB_PORT,
   dialect: "postgres",
-  schema: DB_SCHEMA,
+  schema: DB_SCHEMA ?? "public",
 };

@@ -1,6 +1,7 @@
 import * as Sequelize from 'sequelize';
 import { DataTypes, Model, Optional } from 'sequelize';
 import type { User, UserId } from './user';
+import config from './../config/config';
 
 export interface OtpTokenAttributes {
   id: number;
@@ -87,7 +88,7 @@ export class OtpToken extends Model<OtpTokenAttributes, OtpTokenCreationAttribut
   }, {
     sequelize,
     tableName: 'otp_tokens',
-    schema: 'public',
+    schema: config.schema,
     timestamps: false,
     indexes: [
       {
