@@ -326,9 +326,7 @@ export const bulkUserRegistration: RouteHandlerMethod = async (
             mobile_no,
           } as UserAttributes);
           if (userInstance) {
-            userInstance.password = generateHashedPassword(
-              password ?? "Enlite@1234"
-            );
+            userInstance.password = password;
             await userInstance.save();
           } else {
             userInstance = await UserService.create({
